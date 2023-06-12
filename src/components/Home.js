@@ -23,7 +23,7 @@ const Home = () => {
     }
 
     const signUpPost = (data) => {
-        signupapi(data).then((res)=>{console.log('I am under response'); console.log(res.data)},(error)=>{console.log(error)});
+        signupapi(data).then((res) => { console.log('I am under response'); console.log(res.data) }, (error) => { console.log(error) });
     }
 
     return (

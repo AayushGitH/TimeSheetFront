@@ -13,3 +13,7 @@ export const loginapi = (data) => {
 export const getUserapi = () => {
     return axios.post(`${base_url}/home/details`,localStorage.getItem('token'));
 }
+
+export const checkHolidayapi = (date) => {
+    return axios.get(`${base_url}/home/check/${date}`);
+}

@@ -26,7 +26,8 @@ const Login = () => {
       (response)=>{
         console.log(response.data);
         localStorage.setItem('token',response.data);
-        navigate('/dashboard')
+        // navigate('/dashboard')
+        window.location.href='/dashboard'
       },
       (error)=>{
         console.log(error); 

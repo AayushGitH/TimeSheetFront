@@ -11,6 +11,9 @@ import Projects from './components/Projects';
 import TimeSheets from './components/TimeSheets';
 import Employees from './components/Employees';
 import Holidays from './components/Holidays';
+import Graph from './components/Graph';
+import Example from './components/Example';
+
 
 function App() {
   return (
@@ -29,6 +32,8 @@ function App() {
         <Route path='/timesheets' element={<TimeSheets/>} exact/>
         <Route path='/employees' element={<Employees/>} exact/>
         <Route path='/holidays' element={<Holidays/>} exact/>
+        <Route path='/graph' element={<Graph/>} exact/>
+        <Route path='/example' element={<Example/>} exact/>
       </Routes>
     </BrowserRouter>
     </>
