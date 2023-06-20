@@ -13,6 +13,8 @@ import Employees from './components/Employees';
 import Holidays from './components/Holidays';
 import Graph from './components/Graph';
 import Example from './components/Example';
+import { ToastContainer } from 'react-toastify';
+import Signupdemo from './components/Signupdemo';
 
 
 function App() {
@@ -22,6 +24,7 @@ function App() {
       <div className="sticky-top">
         <Navbar/>
       </div>
+      <ToastContainer/>
       <Routes>
         <Route path='/' element={<Home/>} exact/>
         <Route path='/other' element={<Other/>} exact/>
@@ -32,8 +35,9 @@ function App() {
         <Route path='/timesheets' element={<TimeSheets/>} exact/>
         <Route path='/employees' element={<Employees/>} exact/>
         <Route path='/holidays' element={<Holidays/>} exact/>
-        <Route path='/graph' element={<Graph/>} exact/>
+        <Route path='/graph/:projectId' element={<Graph/>} exact/>
         <Route path='/example' element={<Example/>} exact/>
+        <Route path='/signupdemo' element={<Signupdemo/>} exact/>
       </Routes>
     </BrowserRouter>
     </>

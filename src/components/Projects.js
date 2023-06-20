@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react'
-import { getProjectsapi, updateEmployeesapi, updateProjectapi } from '../services/admin_service'
+import { getClientsapi, getProjectsapi, mapClientapi, updateEmployeesapi, updateProjectapi } from '../services/admin_service'
 import nodata from '../images/nodata.jpg';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Projects = () => {
 
 
   useEffect(() => {
     console.log('Under projects page and I am Aayush')
+    getClientsapi().then((response) => { setClients(response.data) }, (error) => { console.log(error) });
     getProjectsapi().then(
       (response) => {
         setProjects(response.data);
@@ -23,7 +24,8 @@ const Projects = () => {
   const [projects, setProjects] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [editProject, setEditProject] = useState({});
-  const [projectId, setId] = useState();
+  const [clients, setClients] = useState([]);
+  const [assignData, setAssignData] = useState({});
   const navigate = useNavigate();
 
   // Edit Click method
@@ -48,7 +50,30 @@ const Projects = () => {
 
   // Assign Click method
   const onAssignClick = (event, index) => {
-    setId(projects[index].projectId)
+    setAssignData({
+      projectId: projects[index].projectId
+    })
+  }
+
+  // Mapping client  
+  const mapClient = () => {
+    // setAssignData({
+    //   clientId: parseInt(assignData.clientId)
+    // })
+    console.log(assignData)
+    mapClientapi(assignData).then((response) => {
+      console.log(response)
+      navigate('/projects')
+    },
+      (error) => {
+        console.log(error)
+      })
+  }
+
+  // View employee modal press method
+  const onViewEmployeesClick = (event, index) => {
+    setEmployees(projects[index].employee);
+    console.log(employees);
   }
 
   // Renders graph page
@@ -84,9 +109,9 @@ const Projects = () => {
                 <td>{item.employees}</td>
                 <td className='d-flex justify-content-center'>
                   <button className='btn btn-outline-primary btn-sm me-2' onClick={(e) => { onEditClick(e, index) }} data-bs-toggle="modal" data-bs-target="#updateProjectModal">Update</button>
-                  <button className='btn btn-danger btn-sm me-2' disabled>View employees</button>
-                  <button className='btn btn-secondary btn-sm me-2' onClick={(e) => { onAssignClick(e, index) }} data-bs-toggle="modal" data-bs-target="#assignClientModal">Assign Client</button>
-                  <button className='btn btn-warning btn-sm' onClick={viewGraph}>See Graph</button>
+                  <button className='btn btn-danger btn-sm me-2' onClick={(e) => { onViewEmployeesClick(e, index) }} data-bs-toggle="modal" data-bs-target="#viewEmployeesModal">View employees</button>
+                  <button className='btn btn-secondary btn-sm me-2' onClick={(e) => { onAssignClick(e, index) }} data-bs-toggle="modal" data-bs-target="#assignClientModal">Map Client</button>
+                  <Link className='btn btn-warning btn-sm' to={`/graph/${item.projectId}`}>See Graph</Link>
                 </td>
               </tr>
 
@@ -138,29 +163,58 @@ const Projects = () => {
         <div className="modal-dialog">
           <div className="modal-content">
             <div className="modal-header">
-              <h5 className="modal-title" id="exampleModalLabel">Update Project</h5>
+              <h5 className="modal-title" id="exampleModalLabel">Assign Client</h5>
               <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div className="modal-body">
               <form >
                 <div className="mb-1">
-                  <label htmlFor="projectName">Project id</label>
-                  <input type="text" className='form-control' id='projectName' name='projectName' value={projectId} disabled onChange={(e) => { setEditProject({ ...editProject, projectName: e.target.value }) }} required />
+                  <label htmlFor="projectId">Project id</label>
+                  <input type="number" className='form-control' id='projectId' name='projectId' value={assignData.projectId} disabled onChange={(e) => { setAssignData({ ...assignData, projectId: e.target.value }) }} />
                 </div>
                 <div className="mb-1">
-                  <label htmlFor="description">Present Clients</label>
-                  <select name="gender" className='col-12 text-center border border-1 pt-1 pb-1' id="gender">
-                    <option value="TCS">TCS</option>
-                    <option value="Infosys">Infosys</option>
-                    <option value="Accenture">Accenture</option>
-                    <option value="NucleusTeq">NucleusTeq</option>
+                  <label htmlFor="clientId">Present Clients</label>
+                  <select name="clientId" type="select" className='col-12 text-center border border-1 pt-1 pb-1' onChange={(e) => { setAssignData({ ...assignData, clientId: e.target.value }) }} id="clientId">
+                    <option value={0} >--Select Client--</option>
+                    {
+
+                      clients.map((opts) => (
+                        <option value={opts.clientId} key={opts.clientId}>
+                          {"Client :-" + opts.clientName}
+                        </option>
+                      ))
+                    }
                   </select>
                 </div>
                 <div className="modal-footer d-flex justify-content-center">
                   <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                  <button type="button" className="btn btn-primary" onClick={updateProject} data-bs-dismiss="modal">Assign</button>
+                  <button type="button" className="btn btn-primary" onClick={mapClient} data-bs-dismiss="modal">Map</button>
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* View Employees Modal */}
+      <div className="modal fade" id="viewEmployeesModal" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title" id="exampleModalLabel">Employees assigned</h5>
+              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div className="modal-body">
+              {
+                employees.length > 0 ? employees.map((item,index)=>(
+                  <div>
+                    <h6>{item.name}</h6>
+                    <h6>{item.email}</h6>
+                    <hr />
+                  </div>
+                ))
+                : (<h2>No employees assigned yet....</h2>)
+              }
             </div>
           </div>
         </div>

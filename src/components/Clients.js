@@ -20,6 +20,7 @@ const Clients = () => {
 
   // Properties
   const [clients, setClients] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [editClient, setEditClient] = useState({});
 
   // Edit Click method
@@ -39,6 +40,11 @@ const Clients = () => {
         console.log(error);
       }
     )
+  }
+
+  // View project press method
+  const onViewProjectsClick = (event, index) => {
+    setProjects(clients[index].project);
   }
 
   return (
@@ -65,7 +71,7 @@ const Clients = () => {
                 <td>{item.contact}</td>
                 <td className='d-flex justify-content-center'>
                   <button className='btn btn-outline-primary btn-sm me-2' onClick={(e) => { onEditClick(e, index) }} data-bs-toggle="modal" data-bs-target="#updateProjectModal">Update</button>
-                  <button className='btn btn-danger btn-sm me-2' disabled>View projects</button>
+                  <button className='btn btn-danger btn-sm me-2' onClick={(e) => { onViewProjectsClick(e, index) }} data-bs-toggle="modal" data-bs-target="#viewProjectsModal">View projects</button>
                 </td>
               </tr>
 
@@ -103,6 +109,30 @@ const Clients = () => {
                   <button type="button" className="btn btn-primary" onClick={updateClient} data-bs-dismiss="modal">Update</button>
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* View Employees Modal */}
+      <div className="modal fade" id="viewProjectsModal" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title" id="exampleModalLabel">Employees assigned</h5>
+              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div className="modal-body">
+              {
+                projects.length > 0 ? projects.map((item, index) => (
+                  <div>
+                    <h6>{item.projectName}</h6>
+                    <h6>{item.description}</h6>
+                    <hr />
+                  </div>
+                ))
+                  : (<h2>No projects mapped yet....</h2>)
+              }
             </div>
           </div>
         </div>

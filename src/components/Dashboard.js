@@ -13,33 +13,32 @@ const Dashboard = () => {
     // Current date
     let tdate = new Date();
     let tda = tdate.getDate();
-    let tmo = String(tdate.getMonth()+1).padStart(2,'0');
+    let tmo = String(tdate.getMonth() + 1).padStart(2, '0');
     let tye = tdate.getFullYear();
     let currentDate = `${tye}-${tmo}-${tda}`;
-    console.log('Current date is ',currentDate)
+    console.log('Current date is ', currentDate)
     setCDate(currentDate);
 
     // Checking holiday
     checkHolidayapi(currentDate).then(
-    (response)=>{
-      console.log('The response for the holiday api is ',response.data)
-      if(response.data == true)
-      {
-        setHolidayEnabled(true);
+      (response) => {
+        console.log('The response for the holiday api is ', response.data)
+        if (response.data == true) {
+          setHolidayEnabled(true);
+        }
+      },
+      (error) => {
+        console.log(error)
       }
-    },
-    (error)=>{
-      console.log(error)
-    }
     )
 
     // Checking whether today is Sat or Sun
     const d = new Date();
     let day = d.getDay();
     console.log(`Today's day is `, day)
-    if (day != 6) {
+    if (day != 6 || day != 0) {
       setEnabled(true);
-      console.log('I am not Saturday')
+      console.log('I am not Saturday or Sunday')
     }
 
     // User Details fetch api call
@@ -58,12 +57,12 @@ const Dashboard = () => {
 
   // Disabled Date method
   const disabledDate = () => {
-    var today,dd,mm,yyyy;
+    var today, dd, mm, yyyy;
     today = new Date();
     dd = today.getDate() + 1;
     mm = today.getMonth() + 1;
     yyyy = today.getFullYear();
-    return yyyy+"-"+mm+"-"+dd;
+    return yyyy + "-" + mm + "-" + dd;
   }
 
   // Properties
@@ -138,12 +137,13 @@ const Dashboard = () => {
     addTimeSheetapi(timeSheet).then(
       (response) => {
         console.log(response.data)
+        setEnabled(false);
       },
       (error) => {
         console.log(error)
       }
     )
-    console.log(timeSheet.date)
+    console.log(timeSheet)
     e.preventDefault();
   }
 
@@ -174,9 +174,15 @@ const Dashboard = () => {
     navigate('/timeSheets')
   }
 
+  const logOut = () => {
+    localStorage.removeItem('token');
+    // navigate('/')
+    window.location.href = '/'
+  }
+
   return (
     <div>
-      <div className="mt-5 rounded container-fluid shadow-lg col-9 pt-5 pb-5">
+      <div className="mt-5 mb-5 rounded container-fluid shadow-lg col-9 pt-5 pb-5">
         <div className="container-fluid d-flex justify-content-center">
           <div className="container-fluid text-center ">
             <img src={photo} alt="" style={{ width: 100 }} className='border border-2 border-dark rounded' />
@@ -226,6 +232,9 @@ const Dashboard = () => {
               <div className="col-9 bg-danger text-white fw-bold">
                 {user.department}
               </div>
+            </div>
+            <div className="row mb-2 d-flex justify-content-center">
+              <button className='btn btn-danger' onClick={logOut}>Logout</button>
             </div>
           </div>
         </div>
@@ -280,12 +289,12 @@ const Dashboard = () => {
 
           <div className="mt-2 d-flex justify-content-center row">
             <h5 className='text-center'>TimeSheet section</h5>
-            {enabled ? <div className="row col-6">
+            {enabled ? (<div className="row col-6">
               <button className='btn btn-secondary' data-bs-toggle="modal" data-bs-target="#addTimeSheetModal">Add TimeSheet</button>
-            </div> : <div className="row col-6">
+            </div>) : (<div className="row col-6">
               <button className='btn btn-danger' disabled >Add TimeSheet</button>
-            </div>}
-            
+            </div>)}
+
             <div className="row ms-1 col-6">
               <button className='btn btn-success' onClick={viewTimeSheets}>View timesheets</button>
             </div>
@@ -305,7 +314,7 @@ const Dashboard = () => {
                   <div className="row col-12 mb-1">
                     <div className="col-6">
                       <label htmlFor="name">Enter name</label>
-                      <input type="text" className='form-control' id='name' name='name' onChange={(e) => { setEmployee({ ...employee, name: e.target.value }) }} required />
+                      <input type="text" required={true} className='form-control' id='name' name='name' onChange={(e) => { setEmployee({ ...employee, name: e.target.value }) }}/>
                     </div>
                     <div className="col-6">
                       <label htmlFor="password">Enter password</label>
@@ -326,18 +335,29 @@ const Dashboard = () => {
                   </div>
                   <div className="mb-1">
                     <label htmlFor="department">Enter department</label>
-                    <input type="text" className='form-control' id='department' name='department' onChange={(e) => { setEmployee({ ...employee, department: e.target.value }) }} />
+                    {/* <input type="text" className='form-control' id='department' name='department' onChange={(e) => { setEmployee({ ...employee, department: e.target.value }) }} /> */}
+                    <select name="department" className='col-12 text-center border border-1 pt-1 pb-1' id="department" onClick={(e) => { setEmployee({ ...employee, department: e.target.value }) }}>
+                      <option value="IT">IT</option>
+                      <option value="Marketing">Marketing</option>
+                      <option value="HR">HR</option>
+                      <option value="Finance">Finance</option>
+                      <option value="Other">Other</option>
+                    </select>
                   </div>
                   <div className="mb-1">
                     <label htmlFor="status">Enter status</label>
-                    <input type="text" className='form-control' id='status' name='status' onChange={(e) => { setEmployee({ ...employee, status: e.target.value }) }} />
+                    {/* <input type="text" className='form-control' id='status' name='status' onChange={(e) => { setEmployee({ ...employee, status: e.target.value }) }} /> */}
+                    {/* <select name="status" className='col-12 text-center border border-1 pt-1 pb-1' id="status" onClick={(e) => { setEmployee({ ...employee, status: e.target.value }) }}>
+                      <option value="Active">Active</option>
+                      <option value="Inactive">Inactive</option>
+                    </select> */}
                   </div>
                   <div className="mb-1">
                     <label htmlFor="gender">Enter gender</label>
-                    <input type="text" className='form-control' id='gender' name='gender' onChange={(e) => { setEmployee({ ...employee, gender: e.target.value }) }} />
-                    <select name="gender" className='col-12 text-center border border-1 pt-1 pb-1' id="gender">
-                      <option value="Male" onClick={(e) => { setEmployee({ ...employee, gender: e.target.value }) }}>Male</option>
-                      <option value="Male">Female</option>
+                    {/* <input type="text" className='form-control' id='gender' name='gender' onChange={(e) => { setEmployee({ ...employee, gender: e.target.value }) }} /> */}
+                    <select name="gender" className='col-12 text-center border border-1 pt-1 pb-1' id="gender" onClick={(e) => { setEmployee({ ...employee, gender: e.target.value }) }}>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
                     </select>
                   </div>
                   <div className="modal-footer">
@@ -462,7 +482,7 @@ const Dashboard = () => {
                   </div>
                   <div className="mb-1">
                     <label htmlFor="date">Date (Date is autofilled)</label>
-                    <input type="date" className='form-control' id='date' name='date' disabled value={currentDate} onChange={(e) => { setTimeSheet({ ...timeSheet, date: e.target.value }) }} />
+                    <input type="date" className='form-control' id='date' name='date' min={currentDate} max={currentDate} onChange={(e) => { setTimeSheet({ ...timeSheet, date: e.target.value }) }} />
                   </div>
                   <div className="mb-1">
                     <label htmlFor="projectId">Enter project Id</label>
@@ -473,7 +493,7 @@ const Dashboard = () => {
                     <button type="button" className="btn btn-primary" onClick={addTimeSheet} data-bs-dismiss="modal">Add</button>
                   </div>
                 </form> : <h1>You cannot upload timesheet because today is holiday <hr /> Enter your details tomorrow</h1>}
-                
+
               </div>
             </div>
           </div>
